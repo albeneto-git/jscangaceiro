@@ -2,7 +2,9 @@ class Negociacao {
     
     constructor(_data, _quantidade, _valor) {
         Object.assign(this, {_quantidade, _valor});
+        // protege de alterações a propriedade
         this._data = new Date(data.getTime());
+        // Não permite alterar o objeto
         Object.freeze(this);
     }
 
