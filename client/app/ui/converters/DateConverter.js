@@ -1,4 +1,9 @@
 class DateConverter {
+
+    constructor() {
+        throw new Error('Esta classe não deve ser instanciada.')
+    }
+
     static paraTexto( data ){
         return data.getDate()
             + '/' + (data.getMonth() + 1)
