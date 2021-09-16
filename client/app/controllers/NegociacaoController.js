@@ -14,13 +14,7 @@ class NegociacaoController {
     adiciona(event) {
         
         event.preventDefault();
-
-        let negociacao = new Negociacao(
-            DateConverter.paraData(this._inputData.value),
-            parseInt(this._inputQuantidade.value),
-            parseFloat(this._inputValor.value)
-        );
-        this._negociacoes.adiciona(negociacao);
+        this._negociacoes.adiciona(this._criaNegociacao());
         this._limpaFormulario();
         console.log(this._negociacoes.paraArray());
     }
@@ -30,5 +24,13 @@ class NegociacaoController {
         this._inputQuantidade.value = 1;
         this._inputValor.value = 0.0;
         this._inputData.focus();
+    }
+
+    _criaNegociacao() {
+        return new Negociacao(
+            DateConverter.paraData(this._inputData.value),
+            parseInt(this._inputQuantidade.value),
+            parseFloat(this._inputValor.value)
+        );
     }
 }
