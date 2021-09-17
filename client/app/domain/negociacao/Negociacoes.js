@@ -2,6 +2,7 @@ class Negociacoes {
 
     constructor() {
         this._negociacoes = [];
+        Object.freeze(this);
     }
 
     get volumeTotal() {
@@ -16,6 +17,10 @@ class Negociacoes {
 
     paraArray() {
         return [].concat(this._negociacoes);
+    }
+
+    esvazia() {
+        this._negociacoes.length = 0;
     }
     
 }
