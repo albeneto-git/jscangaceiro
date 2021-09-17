@@ -3,7 +3,7 @@ class NegociacaoController {
     constructor() {
         // Criação de variável passando uma função. Foi necessário fazer o bind, 
         //pois document.querySelector estava fora de contexto.
-        let $ = document.querySelector.bind(document);
+        const $ = document.querySelector.bind(document);
 
         this._inputData       = $('#data');
         this._inputQuantidade = $('#quantidade');
