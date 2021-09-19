@@ -70,4 +70,28 @@ class NegociacaoController {
         this._mensagem.texto = 'Negociações apagadas com sucesso';
     }
 
+    importarNegociacoes(){
+        const xhr = new XMLHttpRequest();
+        const self = this;
+        xhr.open('GET', 'http://localhost:3000/negociacoes/semana');
+
+        xhr.onreadystatechange = () => {
+
+            if(xhr.readyState == 4) {
+                if(xhr.status == 200) {
+                    console.log('Obtendo as negociações do servidor.');
+                    JSON
+                      .parse(xhr.responseText)
+                      .map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor))
+                      .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+
+                    self._mensagem.texto = 'Negociações importadas com sucesso!';    
+                }else{
+                    console.log(xhr.responseText);
+                    self._mensagem.texto = 'Não foi possível obter as negociações da semana';
+                }
+            }
+        };
+        xhr.send();
+    }
 }
