@@ -73,7 +73,6 @@ class NegociacaoController {
     }
 
     importarNegociacoes(){
-
         this._service.obtemNegociacoesDaSemana()
         .then(negociacoes => {
             negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao));
