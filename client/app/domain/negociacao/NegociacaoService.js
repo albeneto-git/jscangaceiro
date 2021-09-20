@@ -18,4 +18,34 @@ class NogociacaoService {
                 );
 
     }
+
+    obtemNegociacoesDaSemanaAnterior() {
+
+        return this._http.get('http://localhost:3000/negociacoes/anterior')
+                .then(
+                    dados => {
+                        const negociacoes = dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
+                        return negociacoes;
+                    },
+                    err => {
+                        throw new Error('Não foi possível obter as negociações da semana anterior');
+                    }
+                );
+
+    }
+
+    obtemNegociacoesDaSemanaRetrasada() {
+
+        return this._http.get('http://localhost:3000/negociacoes/retrasada')
+                .then(
+                    dados => {
+                        const negociacoes = dados.map(objeto => new Negociacao(new Date(objeto.data), objeto.quantidade, objeto.valor));
+                        return negociacoes;
+                    },
+                    err => {
+                        throw new Error('Não foi possível obter as negociações da semana retrasada');
+                    }
+                );
+    }
+
 }
