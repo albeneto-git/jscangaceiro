@@ -1,6 +1,6 @@
 # jscangaceiro
 
-Estudos de JavaScript
+Estudos de JavaScript. Este é um curso criado por Flavio Henrique de Souza Almeida, livro da Casa do Código.
 
 ## Objetivos
 
