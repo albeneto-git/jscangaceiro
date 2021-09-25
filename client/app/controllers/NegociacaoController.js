@@ -28,6 +28,18 @@ class NegociacaoController {
         this._mensagemView.update(this._mensagem);
 
         this._service = new NogociacaoService();
+
+        this._init();
+    }
+
+    _init(){
+        DaoFactory
+            .getNegociacaoDao()
+            .then(dao => dao.listaTodos())
+            .then(negociacoes =>
+                    negociacoes.forEach(negociacao =>
+                    this._negociacoes.adiciona(negociacao)))
+            .catch(err => this._mensagem.texto = err);
     }
 
     adiciona(event) {
@@ -78,8 +90,15 @@ class NegociacaoController {
     }
 
     apaga() {
-        this._negociacoes.esvazia();
-        this._mensagem.texto = 'Negociações apagadas com sucesso';
+
+        DaoFactory
+            .getNegociacaoDao()
+            .then(dao => dao.apagaTodas())
+            .then(() => {
+                this._negociacoes.esvazia();
+                this._mensagem.texto = 'Negociações apagadas com sucesso';
+            })
+            .catch(err => this._mensagem.texto = err);
     }
 
     importarNegociacoes(){
