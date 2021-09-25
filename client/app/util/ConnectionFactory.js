@@ -5,49 +5,68 @@
     Só esta fabrica pode fechar a conexão.
 */
 
-const stores = ['negociacoes'];
+const ConnectionFactory = (() => {
 
-let connection = null;
+    const stores = ['negociacoes'];
+    
+    let connection = null;
 
-class ConnectionFactory {
-    constructor() {
-        throw new Error('Não é possível criar instâncias dessa classe');
+    // VARIÁVEL QUE ARMAZENARÁ A FUNÇÃO ORIGINAL
+    let close = null;
+    
+    return class ConnectionFactory {
+        constructor() {
+            throw new Error('Não é possível criar instâncias dessa classe');
+        }
+    
+        static getConnection() {
+            
+            const stores = ['negociacoes'];
+            
+            return new Promise((resolve, reject) => {
+    
+                if(connection) return resolve(connection);
+    
+                const openRequest = indexedDB.open('jscangaceiro', 2);
+    
+                openRequest.onupgradeneeded = e => {
+                    ConnectionFactory._createStores(e.target.result);
+                };
+    
+                openRequest.onsuccess = e => {
+                    connection = e.target.result;
+
+                    // GUARDANDO A FUNÇÃO ORIGINAL!
+                    close = connection.close.bind(connection);
+
+                    connection.close = () => {
+                        throw new Error('Você não pode fechar diretamente a conexão');
+                    };
+                    resolve(e.target.result);
+                };
+    
+                openRequest.onerror = e => {
+                    console.log(e.target.error)
+                    reject(e.target.error.name)
+                };
+            });
+        }
+    
+        static _createStores(connection) {
+            stores.forEach(store => {
+                // if sem bloco, mais sucinto!
+                if(connection.objectStoreNames.contains(store))
+                    connection.deleteObjectStore(store);
+    
+                connection.createObjectStore(store, { autoIncrement: true });
+            });
+        }
+
+        static closeConnection() {
+            if(connection) {
+                close();
+            }
+        }
+    
     }
-
-    static getConnection() {
-        
-        const stores = ['negociacoes'];
-        
-        return new Promise((resolve, reject) => {
-
-            if(connection) return resolve(connection);
-
-            const openRequest = indexedDB.open('jscangaceiro', 2);
-
-            openRequest.onupgradeneeded = e => {
-                ConnectionFactory._createStores(e.target.result);
-            };
-
-            openRequest.onsuccess = e => {
-                connection = e.target.result;
-                resolve(e.target.result);
-            };
-
-            openRequest.onerror = e => {
-                console.log(e.target.error)
-                reject(e.target.error.name)
-            };
-        });
-    }
-
-    static _createStores(connection) {
-        stores.forEach(store => {
-            // if sem bloco, mais sucinto!
-            if(connection.objectStoreNames.contains(store))
-                connection.deleteObjectStore(store);
-
-            connection.createObjectStore(store, { autoIncrement: true });
-        });
-    }
-
-}
+})();
