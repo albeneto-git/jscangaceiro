@@ -1,72 +1,76 @@
-/*
-    Premissas:
-    O metodo getConnection() sempre retorna a mesma conexão para a aplicação toda.
-    Toda conexão tem um metodo close(), porém não pode ser chamado, pois a conexão é única para toda a aplicação.
-    Só esta fabrica pode fechar a conexão.
-*/
+System.register([], function (_export, _context) {
+    "use strict";
 
-const ConnectionFactory = (() => {
+    return {
+        setters: [],
+        execute: function () {
+            /*
+                Premissas:
+                O metodo getConnection() sempre retorna a mesma conexão para a aplicação toda.
+                Toda conexão tem um metodo close(), porém não pode ser chamado, pois a conexão é única para toda a aplicação.
+                Só esta fabrica pode fechar a conexão.
+            */
 
-    const stores = ['negociacoes'];
-    
-    let connection = null;
-
-    // VARIÁVEL QUE ARMAZENARÁ A FUNÇÃO ORIGINAL
-    let close = null;
-    
-    return class ConnectionFactory {
-        constructor() {
-            throw new Error('Não é possível criar instâncias dessa classe');
-        }
-    
-        static getConnection() {
-            
             const stores = ['negociacoes'];
-            
-            return new Promise((resolve, reject) => {
-    
-                if(connection) return resolve(connection);
-    
-                const openRequest = indexedDB.open('jscangaceiro', 2);
-    
-                openRequest.onupgradeneeded = e => {
-                    ConnectionFactory._createStores(e.target.result);
-                };
-    
-                openRequest.onsuccess = e => {
-                    connection = e.target.result;
+            let connection = null;
+            let close = null;
 
-                    // GUARDANDO A FUNÇÃO ORIGINAL!
-                    close = connection.close.bind(connection);
+            class ConnectionFactory {
+                constructor() {
+                    throw new Error('Não é possível criar instâncias dessa classe');
+                }
 
-                    connection.close = () => {
-                        throw new Error('Você não pode fechar diretamente a conexão');
-                    };
-                    resolve(e.target.result);
-                };
-    
-                openRequest.onerror = e => {
-                    console.log(e.target.error)
-                    reject(e.target.error.name)
-                };
-            });
-        }
-    
-        static _createStores(connection) {
-            stores.forEach(store => {
-                // if sem bloco, mais sucinto!
-                if(connection.objectStoreNames.contains(store))
-                    connection.deleteObjectStore(store);
-    
-                connection.createObjectStore(store, { autoIncrement: true });
-            });
-        }
+                static getConnection() {
 
-        static closeConnection() {
-            if(connection) {
-                close();
+                    const stores = ['negociacoes'];
+
+                    return new Promise((resolve, reject) => {
+
+                        if (connection) return resolve(connection);
+
+                        const openRequest = indexedDB.open('jscangaceiro', 2);
+
+                        openRequest.onupgradeneeded = e => {
+                            ConnectionFactory._createStores(e.target.result);
+                        };
+
+                        openRequest.onsuccess = e => {
+                            connection = e.target.result;
+
+                            // GUARDANDO A FUNÇÃO ORIGINAL!
+                            close = connection.close.bind(connection);
+
+                            connection.close = () => {
+                                throw new Error('Você não pode fechar diretamente a conexão');
+                            };
+                            resolve(e.target.result);
+                        };
+
+                        openRequest.onerror = e => {
+                            console.log(e.target.error);
+                            reject(e.target.error.name);
+                        };
+                    });
+                }
+
+                static _createStores(connection) {
+                    stores.forEach(store => {
+                        // if sem bloco, mais sucinto!
+                        if (connection.objectStoreNames.contains(store)) connection.deleteObjectStore(store);
+
+                        connection.createObjectStore(store, { autoIncrement: true });
+                    });
+                }
+
+                static closeConnection() {
+                    if (connection) {
+                        close();
+                    }
+                }
             }
+
+            _export('ConnectionFactory', ConnectionFactory);
         }
-    
-    }
-})();
+    };
+});
+//# sourceMappingURL=ConnectionFactory.js.map

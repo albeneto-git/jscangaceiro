@@ -1,31 +1,42 @@
-class ProxyFactory {
-    static create(objeto, props, armadilha) {
+System.register([], function (_export, _context) {
+    "use strict";
 
-       return new Proxy(objeto, {
+    return {
+        setters: [],
+        execute: function () {
+            class ProxyFactory {
+                static create(objeto, props, armadilha) {
 
-            get(target, prop, receiver){
+                    return new Proxy(objeto, {
 
-                if(ProxyFactory._ehFuncao(target[prop]) && props.includes(prop)) {
-                    return function() {
-                        console.log(`"${prop}" disparou a armadilha`);
-                        target[prop].apply(target, arguments);
-                        armadilha(target)
-                    }
+                        get(target, prop, receiver) {
 
-                } else {
-                    // realizando um get padrão
-                    return target[prop];
+                            if (ProxyFactory._ehFuncao(target[prop]) && props.includes(prop)) {
+                                return function () {
+                                    console.log(`"${prop}" disparou a armadilha`);
+                                    target[prop].apply(target, arguments);
+                                    armadilha(target);
+                                };
+                            } else {
+                                // realizando um get padrão
+                                return target[prop];
+                            }
+                        },
+                        set(target, prop, value, receiver) {
+                            const updated = Reflect.set(target, prop, value);
+                            if (props.includes(prop)) armadilha(target);
+                            return updated;
+                        }
+                    });
                 }
-            },
-            set(target, prop, value, receiver) {
-                const updated = Reflect.set(target, prop, value);
-                if(props.includes(prop)) armadilha(target);
-                return updated;
-            }
-        });
-    }
 
-    static _ehFuncao(fn) {
-        return typeof(fn) == typeof(Function);
-    }
-}
+                static _ehFuncao(fn) {
+                    return typeof fn == typeof Function;
+                }
+            }
+
+            _export("ProxyFactory", ProxyFactory);
+        }
+    };
+});
+//# sourceMappingURL=ProxyFactory.js.map
