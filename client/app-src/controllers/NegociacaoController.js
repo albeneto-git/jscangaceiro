@@ -37,12 +37,13 @@ export class NegociacaoController {
     }
 
     _init(){
-        getNegociacaoDao()
-            .then(dao => dao.listaTodos())
-            .then(negociacoes =>
-                    negociacoes.forEach(negociacao =>
-                    this._negociacoes.adiciona(negociacao)))
-            .catch(err => this._mensagem.texto = err);
+        try {
+            const dao = await getNegociacaoDao();
+            const negociacoes = await dao.listaTodos();
+            negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao));
+        } catch (err) {
+            this._mensagem.texto = err.message;
+        }
     }
 
     adiciona(event) {
