@@ -48,32 +48,15 @@ export class NegociacaoController {
 
     adiciona(event) {
         try {
-            
             event.preventDefault();
-
             const negociacao = this._criaNegociacao();
-
-            getNegociacaoDao()
-                .then(dao => dao.adiciona(negociacao))
-                .then(() => {
-                    // só tentará incluir na tabela se conseguiu antes incluir no banco
-                    this._negociacoes.adiciona(negociacao);
-                    this._mensagem.texto = 'Negociação adicionada com sucesso';
-                    this._limpaFormulario();
-                })
-                .catch(err => this._mensagem.texto = err);
-
+            const dao = await getNegociacaoDao();
+            await dao.adiciona(negociacao);
+            this._negociacoes.adiciona(negociacao);
+            this._mensagem.texto = 'Negociação adicionada com sucesso';
+            this._limpaFormulario();
         } catch (err) {
-
-            console.log(err);
-            console.log(err.stack);
-
-            if(err instanceof DataInvalidaException) {
-                this._mensagem.texto = err.message;
-            } else {
-                // mensagem genérica para qualquer problema que possa acontecer
-                this._mensagem.texto = 'Um erro não esperado aconteceu. Entre em contato com o suporte';
-            }  
+            this._mensagem.texto = err
         }
     }
 
