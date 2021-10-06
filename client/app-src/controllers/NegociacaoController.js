@@ -76,14 +76,14 @@ export class NegociacaoController {
     }
 
     apaga() {
-
-        getNegociacaoDao()
-            .then(dao => dao.apagaTodas())
-            .then(() => {
-                this._negociacoes.esvazia();
-                this._mensagem.texto = 'Negociações apagadas com sucesso';
-            })
-            .catch(err => this._mensagem.texto = err);
+        try {
+            const dao = await getNegociacaoDao();
+            await dao.apagaTodos();
+            this._negociacoes.esvazia();
+            this._mensagem.texto = 'Negociações apagadas com sucesso'
+        } catch (err) {
+            this._mensagem.texto = err
+        }
     }
 
     importarNegociacoes(){
