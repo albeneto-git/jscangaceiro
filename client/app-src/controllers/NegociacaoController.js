@@ -86,23 +86,17 @@ export class NegociacaoController {
         }
     }
 
-    importarNegociacoes(){
-
-        // this._service
-        // .obtemNegociacoesDoPeriodo()
-        // .then(negociacoes => {
-        //     negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao));
-        //         this._mensagem.texto = 'Negociações do período importadascom sucesso';
-        // }).catch(err => this._mensagem.texto = err);
-
-        this._service
-        .obtemNegociacoesDoPeriodo()
-        .then(negociacoes => {
+    async importarNegociacoes(){
+        try {
+            const negociacoes = await this._service.obtemNegociacoesDoPeriodo();
+            console.log(negociacoes);
             negociacoes.filter(novaNegociacao =>
-                    !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente)))
-                    .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+            !this._negociacoes.paraArray().some(negociacaoExistente =>
+                    novaNegociacao.equals(negociacaoExistente)))
+                            .forEach(negociacao => this._negociacoes.adiciona(negociacao));
             this._mensagem.texto = 'Negociações do período importadas com sucesso';
-        })
-        .catch(err => this._mensagem.texto = err);
+        } catch(err) {
+            this._mensagem.texto = err.message;
+        }
     }
 }
