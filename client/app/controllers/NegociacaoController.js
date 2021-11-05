@@ -1,7 +1,7 @@
 System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], function (_export, _context) {
     "use strict";
 
-    var Negociacoes, NegociacaoService, Negociacao, NegociacoesView, MensagemView, Mensagem, DataInvalidaException, DateConverter, getNegociacaoDao, Bind;
+    var Negociacoes, NegociacaoService, Negociacao, NegociacoesView, MensagemView, Mensagem, DataInvalidaException, DateConverter, getNegociacaoDao, Bind, getExceptionMessage;
     return {
         setters: [function (_domainIndexJs) {
             Negociacoes = _domainIndexJs.Negociacoes;
@@ -16,6 +16,7 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
         }, function (_utilIndexJs) {
             getNegociacaoDao = _utilIndexJs.getNegociacaoDao;
             Bind = _utilIndexJs.Bind;
+            getExceptionMessage = _utilIndexJs.getExceptionMessage;
         }],
         execute: function () {
             class NegociacaoController {
@@ -54,7 +55,7 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
                         this._mensagem.texto = 'Negociação adicionada com sucesso';
                         this._limpaFormulario();
                     } catch (err) {
-                        this._mensagem.texto = err.message;
+                        this._mensagem.texto = getExceptionMessage(err);
                     }
                 }
 
@@ -69,15 +70,7 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
                             this._limpaFormulario();
                         }).catch(err => this._mensagem.texto = err);
                     } catch (err) {
-                        console.log(err);
-                        console.log(err.stack);
-
-                        if (err instanceof DataInvalidaException) {
-                            this._mensagem.texto = err.message;
-                        } else {
-                            // mensagem genérica para qualquer problema que possa acontecer
-                            this._mensagem.texto = 'Um erro não esperado aconteceu. Entre em contato com o suporte';
-                        }
+                        this._mensagem.texto = getExceptionMessage(err);
                     }
                 }
 
@@ -99,7 +92,7 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
                         this._negociacoes.esvazia();
                         this._mensagem.texto = 'Negociações apagadas com sucesso';
                     } catch (err) {
-                        this._mensagem.texto = err.message;
+                        this._mensagem.texto = getExceptionMessage(err);
                     }
                 }
 
@@ -110,7 +103,7 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
                         negociacoes.filter(novaNegociacao => !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente))).forEach(negociacao => this._negociacoes.adiciona(negociacao));
                         this._mensagem.texto = 'Negociações do período importadas com sucesso';
                     } catch (err) {
-                        this._mensagem.texto = err.message;
+                        this._mensagem.texto = getExceptionMessage(err);
                     }
                 }
             }
