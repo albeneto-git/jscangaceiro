@@ -47,7 +47,6 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
 
                 async _init() {
                     try {
-                        event.preventDefault();
                         const negociacao = this._criaNegociacao();
                         const dao = await getNegociacaoDao();
                         await dao.adiciona(negociacao);
@@ -88,7 +87,7 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
                 async apaga() {
                     try {
                         const dao = await getNegociacaoDao();
-                        await dao.apagaTodos();
+                        await dao.apagaTodas();
                         this._negociacoes.esvazia();
                         this._mensagem.texto = 'Negociações apagadas com sucesso';
                     } catch (err) {
