@@ -44,8 +44,18 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
                     this._init();
                 }
 
-                _init() {
-                    getNegociacaoDao().then(dao => dao.listaTodos()).then(negociacoes => negociacoes.forEach(negociacao => this._negociacoes.adiciona(negociacao))).catch(err => this._mensagem.texto = err);
+                async _init() {
+                    try {
+                        event.preventDefault();
+                        const negociacao = this._criaNegociacao();
+                        const dao = await getNegociacaoDao();
+                        await dao.adiciona(negociacao);
+                        this._negociacoes.adiciona(negociacao);
+                        this._mensagem.texto = 'Negociação adicionada com sucesso';
+                        this._limpaFormulario();
+                    } catch (err) {
+                        this._mensagem.texto = err.message;
+                    }
                 }
 
                 adiciona(event) {
@@ -82,18 +92,26 @@ System.register(['../domain/index.js', '../ui/index.js', '../util/index.js'], fu
                     return new Negociacao(DateConverter.paraData(this._inputData.value), parseInt(this._inputQuantidade.value), parseFloat(this._inputValor.value));
                 }
 
-                apaga() {
-                    getNegociacaoDao().then(dao => dao.apagaTodas()).then(() => {
+                async apaga() {
+                    try {
+                        const dao = await getNegociacaoDao();
+                        await dao.apagaTodos();
                         this._negociacoes.esvazia();
                         this._mensagem.texto = 'Negociações apagadas com sucesso';
-                    }).catch(err => this._mensagem.texto = err);
+                    } catch (err) {
+                        this._mensagem.texto = err.message;
+                    }
                 }
 
-                importarNegociacoes() {
-                    this._service.obtemNegociacoesDoPeriodo().then(negociacoes => {
+                async importarNegociacoes() {
+                    try {
+                        const negociacoes = await this._service.obtemNegociacoesDoPeriodo();
+                        console.log(negociacoes);
                         negociacoes.filter(novaNegociacao => !this._negociacoes.paraArray().some(negociacaoExistente => novaNegociacao.equals(negociacaoExistente))).forEach(negociacao => this._negociacoes.adiciona(negociacao));
                         this._mensagem.texto = 'Negociações do período importadas com sucesso';
-                    }).catch(err => this._mensagem.texto = err);
+                    } catch (err) {
+                        this._mensagem.texto = err.message;
+                    }
                 }
             }
 
